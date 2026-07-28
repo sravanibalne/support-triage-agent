@@ -1,0 +1,57 @@
+[
+  {
+    "question": "What plans does TaskFlow offer?",
+    "answer": "TaskFlow has three plans: Free (up to 3 users, core features), Pro ($8/user/month — unlimited projects and integrations), and Team ($15/user/month — adds admin controls and priority support). You can upgrade or downgrade anytime from Settings > Billing.",
+    "keywords": ["plan", "plans", "pricing", "price", "cost", "subscription tiers"]
+  },
+  {
+    "question": "How do I cancel my subscription?",
+    "answer": "Go to Settings > Billing > Manage Subscription, and click \"Cancel Plan.\" Your account will remain active until the end of the current billing cycle, after which it reverts to the Free plan. No cancellation fees apply.",
+    "keywords": ["cancel", "cancellation", "unsubscribe", "downgrade"]
+  },
+  {
+    "question": "What's your refund policy?",
+    "answer": "We offer a full refund within 14 days of a new subscription purchase if you're not satisfied. Refunds for renewals are evaluated case-by-case — contact support with your account email and reason for the request.",
+    "keywords": ["refund", "money back", "reimburse"]
+  },
+  {
+    "question": "How do I reset my password?",
+    "answer": "Click \"Forgot Password\" on the login screen and enter your email. You'll receive a reset link valid for 30 minutes. If you don't see the email, check your spam folder or request a new link after 30 minutes.",
+    "keywords": ["password", "reset", "login", "forgot password", "locked out"]
+  },
+  {
+    "question": "How do I invite team members?",
+    "answer": "Go to Settings > Team > Invite Members, enter their email addresses, and choose a role (Admin or Member). They'll receive an email invite with a link to join your workspace.",
+    "keywords": ["invite", "team member", "add user", "collaborator"]
+  },
+  {
+    "question": "Can I change a team member's role after inviting them?",
+    "answer": "Yes — Admins can go to Settings > Team, click the member's name, and update their role between Admin and Member at any time.",
+    "keywords": ["role", "permission", "admin", "member role"]
+  },
+  {
+    "question": "Does TaskFlow integrate with Slack?",
+    "answer": "Yes, Pro and Team plans include native Slack integration. Go to Settings > Integrations > Slack and follow the connect flow to receive task notifications directly in a Slack channel.",
+    "keywords": ["slack", "integration", "integrate", "notifications"]
+  },
+  {
+    "question": "Can I export my project data?",
+    "answer": "Yes, all plans support CSV export. Open any project, click the \"...\" menu, and select \"Export as CSV\" to download all tasks, assignees, and statuses.",
+    "keywords": ["export", "csv", "download data", "backup"]
+  },
+  {
+    "question": "Is there a file attachment size limit?",
+    "answer": "Free plan attachments are limited to 10MB per file. Pro and Team plans support attachments up to 100MB per file.",
+    "keywords": ["attachment", "file size", "upload limit"]
+  },
+  {
+    "question": "How is my data secured?",
+    "answer": "TaskFlow encrypts data in transit (TLS) and at rest. We perform regular security audits and do not share customer data with third parties. Full details are available in our Privacy Policy.",
+    "keywords": ["security", "encryption", "privacy", "data protection"]
+  },
+  {
+    "question": "Can I delete my account and all associated data?",
+    "answer": "Yes — go to Settings > Account > Delete Account. This permanently removes your workspace and all associated data within 30 days, in line with our data retention policy.",
+    "keywords": ["delete account", "remove account", "data deletion"]
+  }
+]

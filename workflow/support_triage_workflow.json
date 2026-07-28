@@ -1,0 +1,166 @@
+{
+  "name": "support_triage_workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "Label_3561565326567719789"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "25fff115-eaf7-465b-a416-e890ecb21edf",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "psdH3KN9dNdbVvkW",
+          "name": "Gmail - taskflow test"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.text }}",
+        "options": {
+          "systemMessage": "You are a customer support triage agent for TaskFlow, a project-management SaaS tool.\n\nFor each incoming support email, you must:\n1. Classify it into exactly one category: \"Billing\", \"Technical Issue\", \"Feature Request\", \"Account/Access\", or \"General Inquiry\"\n2. Assess its priority as \"Low\", \"Medium\", or \"High\" based on genuine urgency and business impact — not the customer's tone or emotional intensity. Use these guidelines:\n   - High: objectively serious issues (e.g., billing errors, data loss, being locked out of the account, security concerns) — escalate to High even if the customer's tone is calm or they say it's not urgent.\n   - Low: cosmetic issues, feature suggestions, or general questions — even if the customer's tone is angry or uses urgent language (\"ASAP\", \"unacceptable\").\n   - Medium: use this as the default when the email lacks enough information to determine real severity (e.g., vague messages like \"it's not working\"). Do not default to High just because the wording sounds urgent — ask a clarifying question instead of assuming severity.\n3. Draft a brief, professional, empathetic reply (3-5 sentences) addressing the customer's concern. If the message is unrelated to TaskFlow (e.g., spam, off-topic content), do not engage with its content — provide a brief, generic reply.\n4. Use the FAQ lookup tool when the customer's question relates to product features, pricing, or policies you're unsure about — ground your reply in real product facts rather than guessing.\n\nRespond with ONLY valid JSON containing EXACTLY these three keys — no additional fields, no markdown fences, no extra text:\n{\n  \"category\": \"...\",\n  \"priority\": \"...\",\n  \"draft_reply\": \"...\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e9deb0b9-abc2-4640-9809-e5cf449ad64f",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "claude-sonnet-4-5-20250929",
+          "cachedResultName": "Claude Sonnet 4.5"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "typeVersion": 1.3,
+      "position": [
+        80,
+        208
+      ],
+      "id": "4675c6cf-00f2-4331-987a-347cb5168402",
+      "name": "Anthropic Chat Model",
+      "credentials": {
+        "anthropicApi": {
+          "id": "It7dzULyxgMA1gde",
+          "name": "Anthropic account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let raw = $input.first().json.output;\nlet cleaned = raw.trim();\nif (cleaned.startsWith(\"```\")) {\n  cleaned = cleaned.split(\"```\")[1];\n  cleaned = cleaned.replace(/^json\\s*/i, \"\").trim();\n}\nreturn [{ json: JSON.parse(cleaned) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        0
+      ],
+      "id": "d2877ea2-ba07-48d9-8fef-75439db0db5b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "description": "Searches the TaskFlow FAQ knowledge base for information relevant to a customer's question. Input should be a short search query or key terms from the customer's email (e.g., \"password reset\", \"export data\", \"pricing\"). Returns matching FAQ entries with question and answer text, or a message if nothing matches.",
+        "jsCode": "const faqData = [\n  {\"question\": \"What plans does TaskFlow offer?\", \"answer\": \"TaskFlow has three plans: Free (up to 3 users, core features), Pro ($8/user/month — unlimited projects and integrations), and Team ($15/user/month — adds admin controls and priority support). You can upgrade or downgrade anytime from Settings > Billing.\", \"keywords\": [\"plan\", \"plans\", \"pricing\", \"price\", \"cost\", \"subscription tiers\"]},\n  {\"question\": \"How do I cancel my subscription?\", \"answer\": \"Go to Settings > Billing > Manage Subscription, and click \\\"Cancel Plan.\\\" Your account will remain active until the end of the current billing cycle, after which it reverts to the Free plan. No cancellation fees apply.\", \"keywords\": [\"cancel\", \"cancellation\", \"unsubscribe\", \"downgrade\"]},\n  {\"question\": \"What's your refund policy?\", \"answer\": \"We offer a full refund within 14 days of a new subscription purchase if you're not satisfied. Refunds for renewals are evaluated case-by-case — contact support with your account email and reason for the request.\", \"keywords\": [\"refund\", \"money back\", \"reimburse\"]},\n  {\"question\": \"How do I reset my password?\", \"answer\": \"Click \\\"Forgot Password\\\" on the login screen and enter your email. You'll receive a reset link valid for 30 minutes. If you don't see the email, check your spam folder or request a new link after 30 minutes.\", \"keywords\": [\"password\", \"reset\", \"login\", \"forgot password\", \"locked out\"]},\n  {\"question\": \"How do I invite team members?\", \"answer\": \"Go to Settings > Team > Invite Members, enter their email addresses, and choose a role (Admin or Member). They'll receive an email invite with a link to join your workspace.\", \"keywords\": [\"invite\", \"team member\", \"add user\", \"collaborator\"]},\n  {\"question\": \"Can I change a team member's role after inviting them?\", \"answer\": \"Yes — Admins can go to Settings > Team, click the member's name, and update their role between Admin and Member at any time.\", \"keywords\": [\"role\", \"permission\", \"admin\", \"member role\"]},\n  {\"question\": \"Does TaskFlow integrate with Slack?\", \"answer\": \"Yes, Pro and Team plans include native Slack integration. Go to Settings > Integrations > Slack and follow the connect flow to receive task notifications directly in a Slack channel.\", \"keywords\": [\"slack\", \"integration\", \"integrate\", \"notifications\"]},\n  {\"question\": \"Can I export my project data?\", \"answer\": \"Yes, all plans support CSV export. Open any project, click the \\\"...\\\" menu, and select \\\"Export as CSV\\\" to download all tasks, assignees, and statuses.\", \"keywords\": [\"export\", \"csv\", \"download data\", \"backup\"]},\n  {\"question\": \"Is there a file attachment size limit?\", \"answer\": \"Free plan attachments are limited to 10MB per file. Pro and Team plans support attachments up to 100MB per file.\", \"keywords\": [\"attachment\", \"file size\", \"upload limit\"]},\n  {\"question\": \"How is my data secured?\", \"answer\": \"TaskFlow encrypts data in transit (TLS) and at rest. We perform regular security audits and do not share customer data with third parties. Full details are available in our Privacy Policy.\", \"keywords\": [\"security\", \"encryption\", \"privacy\", \"data protection\"]},\n  {\"question\": \"Can I delete my account and all associated data?\", \"answer\": \"Yes — go to Settings > Account > Delete Account. This permanently removes your workspace and all associated data within 30 days, in line with our data retention policy.\", \"keywords\": [\"delete account\", \"remove account\", \"data deletion\"]}\n];\n\nconst query = $input.item.json.query || $input.item.json.input || \"\";\nconst q = query.toLowerCase();\n\nconst matches = faqData.filter(entry => {\n  const inQuestion = entry.question.toLowerCase().includes(q);\n  const inKeywords = entry.keywords.some(k => q.includes(k) || k.includes(q));\n  return inQuestion || inKeywords;\n});\n\nif (matches.length === 0) {\n  return \"No matching FAQ entry found.\";\n}\n\nreturn matches.map(m => `Q: ${m.question}\\nA: ${m.answer}`).join(\"\\n\\n\");"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.3,
+      "position": [
+        368,
+        208
+      ],
+      "id": "8ea6f41e-4679-4b52-a6b8-2c86e001680a",
+      "name": "Code Tool"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Gmail Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Anthropic Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "f4bdf30a-58a2-4c6a-a345-4e9f262bc605",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5a77169379d97309e1bf55c0048957ac37b7a80a1561fe3698a202af190cfa8c"
+  },
+  "id": "J5K6lwfVmsZrQLMV",
+  "tags": []
+}
